@@ -1,0 +1,73 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  isSystem  Boolean  @default(false) @map("is_system")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  wallets   Wallet[]
+  ledgerEntries LedgerEntry[]
+
+  @@map("users")
+}
+
+model AssetType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  wallets   Wallet[]
+  ledgerEntries LedgerEntry[]
+
+  @@map("asset_types")
+}
+
+model Wallet {
+  userId      Int        @map("user_id")
+  assetTypeId Int        @map("asset_type_id")
+  balance     Decimal    @default(0) @db.Decimal(20, 2)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  
+  user        User       @relation(fields: [userId], references: [id])
+  assetType   AssetType  @relation(fields: [assetTypeId], references: [id])
+
+  @@id([userId, assetTypeId])
+  @@map("wallets")
+}
+
+model LedgerEntry {
+  id            BigInt      @id @default(autoincrement())
+  transactionId String      @map("transaction_id") @db.Uuid
+  userId        Int         @map("user_id")
+  assetTypeId   Int         @map("asset_type_id")
+  entryType     EntryType   @map("entry_type")
+  amount        Decimal     @db.Decimal(20, 2)
+  description   String?     @db.VarChar(255)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  
+  user          User        @relation(fields: [userId], references: [id])
+  assetType     AssetType   @relation(fields: [assetTypeId], references: [id])
+
+  @@index([userId, assetTypeId])
+  @@index([transactionId])
+  @@index([createdAt])
+  @@map("ledger")
+}
+
+enum EntryType {
+  credit
+  debit
+  
+  @@map("entry_type")
+}
