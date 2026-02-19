@@ -8,8 +8,9 @@
         "db:deploy": "bunx --bun prisma migrate deploy",
         "db:seed": "bunx --bun prisma db seed",
         "db:generate": "bunx --bun prisma generate",
-        "db:studio": "bunx --bun prisma studio",
-        "db:format": "bunx --bun prisma format"
+        "db:format": "bunx --bun prisma format",
+        "dev": "bun --hot index.ts",
+        "start": "bun index.ts"
     },
     "devDependencies": {
         "@types/bun": "latest",
@@ -22,6 +23,7 @@
     "dependencies": {
         "@prisma/adapter-pg": "^7.4.0",
         "@prisma/client": "^7.4.0",
+        "hono": "^4.11.10",
         "pg": "^8.18.0"
     }
 }
