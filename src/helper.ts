@@ -225,7 +225,9 @@ export const bonus = async (req: Request): Promise<Response> => {
 
 export const getTransactionHistory = async (req: Request): Promise<Response> => {
     try {
-        const { userId } = await req.json() as { userId: number };
+        const url = new URL(req.url);
+
+        let userId: number | undefined = url.searchParams.get("userId") ? parseInt(url.searchParams.get("userId")!) : undefined;
         if (!userId) return Response.json({ status: "error", message: "Missing userId" }, { status: 400 });
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -249,8 +251,7 @@ export const getTransactionHistory = async (req: Request): Promise<Response> => 
                             'description', al.description,
                             'createdAt', al.created_at
                         ) ORDER BY al.created_at DESC, al.id DESC
-                    ) as history,
-                    SUM(CASE WHEN al.entry_type = 'credit' THEN al.amount ELSE -al.amount END) as net_change
+                    ) as history
                 FROM audit_ledger al
                 WHERE al.user_id = ${userId}
                 GROUP BY al.asset_type_id
@@ -258,8 +259,7 @@ export const getTransactionHistory = async (req: Request): Promise<Response> => 
             SELECT 
                 at.id as "assetTypeId",
                 at.name as "assetTypeName",
-                uw.balance as "finalBalance",
-                (uw.balance - COALESCE(ah.net_change, 0)) as "initialBalance",
+                uw.balance as "balance",
                 COALESCE(ah.history, '[]'::json) as "history"
             FROM asset_types at
             JOIN user_wallets uw ON at.id = uw.asset_type_id
