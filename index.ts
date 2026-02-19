@@ -22,6 +22,3 @@ export default {
     port: PORT,
     fetch: app.fetch,
 };
-
-console.log(`Server running on http://localhost:${PORT}`);
-console.log(`Health check: http://localhost:${PORT}/health`);
