@@ -81,7 +81,7 @@ model IdempotencyKey {
   userId         Int               @map("user_id")
   method         String
   path           String
-  idempotencyKey String            @map("idempotency_key") @db.Uuid
+  idempotencyKey String            @map("idempotency_key") @db.VarChar(50)
   status         IdempotencyStatus
   payloadHash    String            @map("payload_hash")
 
