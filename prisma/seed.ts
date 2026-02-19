@@ -38,19 +38,20 @@ async function main() {
     });
 
     // creating audit ledger records
+    const transactionId = Bun.randomUUIDv7();
     await prisma.auditLedger.createMany({
         data: [
-            { transactionId: Bun.randomUUIDv7(), userId: 1, assetTypeId: 1, entryType: "credit", amount: 1000000, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 1, assetTypeId: 2, entryType: "credit", amount: 1000000, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 1, assetTypeId: 3, entryType: "credit", amount: 1000000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 1, assetTypeId: 1, entryType: "credit", amount: 1000000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 1, assetTypeId: 2, entryType: "credit", amount: 1000000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 1, assetTypeId: 3, entryType: "credit", amount: 1000000, description: "Initial balance" },
 
-            { transactionId: Bun.randomUUIDv7(), userId: 2, assetTypeId: 1, entryType: "credit", amount: 1000, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 2, assetTypeId: 2, entryType: "credit", amount: 1000, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 2, assetTypeId: 3, entryType: "credit", amount: 1000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 2, assetTypeId: 1, entryType: "credit", amount: 1000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 2, assetTypeId: 2, entryType: "credit", amount: 1000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 2, assetTypeId: 3, entryType: "credit", amount: 1000, description: "Initial balance" },
 
-            { transactionId: Bun.randomUUIDv7(), userId: 3, assetTypeId: 1, entryType: "credit", amount: 100, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 3, assetTypeId: 2, entryType: "credit", amount: 1000, description: "Initial balance" },
-            { transactionId: Bun.randomUUIDv7(), userId: 3, assetTypeId: 3, entryType: "credit", amount: 100, description: "Initial balance" },
+            { transactionId: transactionId, userId: 3, assetTypeId: 1, entryType: "credit", amount: 100, description: "Initial balance" },
+            { transactionId: transactionId, userId: 3, assetTypeId: 2, entryType: "credit", amount: 1000, description: "Initial balance" },
+            { transactionId: transactionId, userId: 3, assetTypeId: 3, entryType: "credit", amount: 100, description: "Initial balance" },
         ]
     });
 
