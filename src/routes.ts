@@ -86,7 +86,7 @@ app.post("/purchase-credits", async (c) => {
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId } },
             });
 
-            if (!treasuryWallet || treasuryWallet.balance < amount) {
+            if (!treasuryWallet || treasuryWallet.balance.lt(amount)) {
                 throw new TransactionError("Treasury has insufficient funds", 400);
             }
 
@@ -183,9 +183,7 @@ app.post("/spend-credits", async (c) => {
                 where: { userId_assetTypeId: { userId, assetTypeId } },
             });
 
-            console.log(`balance :: ${userWallet?.balance}`);
-            console.log(`amount :: ${amount}`)
-            if (!userWallet || userWallet.balance < amount) {
+            if (!userWallet || userWallet.balance.lt(amount)) {
                 throw new TransactionError("User has insufficient credits", 400);
             }
 
@@ -274,7 +272,7 @@ app.post("/bonus", async (c) => {
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId: BONUS_ASSET_TYPE_ID } },
             });
 
-            if (!treasuryWallet || treasuryWallet.balance < amount) {
+            if (!treasuryWallet || treasuryWallet.balance.lt(amount)) {
                 throw new TransactionError("Treasury has insufficient loyalty points for bonus", 400);
             }
 
