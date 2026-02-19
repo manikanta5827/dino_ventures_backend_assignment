@@ -81,7 +81,7 @@ export async function idempotencyMiddleware(c: Context, next: Next) {
 
     // if idempotency key is expired then delete it and create a new one
     if (existing.expiresAt < now) {
-      await prisma.idempotencyKey.delete({ where: { id: existing.id } });
+      await prisma.idempotencyKey.delete({ where: { userId_method_path_idempotencyKey: { userId, method, path, idempotencyKey } } });
       await prisma.idempotencyKey.create({
         data: {
           userId,
@@ -120,7 +120,7 @@ export async function idempotencyMiddleware(c: Context, next: Next) {
     // if request is in progress but inProgressUntil is expired
     if (existing.status === IdempotencyStatus.IN_PROGRESS && existing.inProgressUntil <= now) {
       await prisma.idempotencyKey.update({
-        where: { id: existing.id },
+        where: { userId_method_path_idempotencyKey: { userId, method, path, idempotencyKey } },
         data: { inProgressUntil: new Date(now.getTime() + IDEMPOTENCY_CONFIG.inProgressTTL * 1000) },
       });
 
