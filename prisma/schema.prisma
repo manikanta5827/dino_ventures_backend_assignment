@@ -15,8 +15,9 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  wallets       Wallet[]
-  ledgerEntries AuditLedger[]
+  wallets         Wallet[]
+  ledgerEntries   AuditLedger[]
+  idempotencyKeys IdempotencyKey[]
 
   @@map("users")
 }
@@ -35,8 +36,8 @@ model AssetType {
 }
 
 model Wallet {
-  userId      Int    @map("user_id")
-  assetTypeId Int    @map("asset_type_id")
+  userId      Int     @map("user_id")
+  assetTypeId Int     @map("asset_type_id")
   balance     Decimal @default(0) @db.Decimal(20, 2)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -74,4 +75,33 @@ enum EntryType {
   debit
 
   @@map("entry_type")
+}
+
+model IdempotencyKey {
+  id             String            @id @default(cuid())
+  userId         Int               @map("user_id")
+  method         String
+  path           String
+  idempotencyKey String            @map("idempotency_key") @db.Uuid
+  status         IdempotencyStatus
+  payloadHash    String            @map("payload_hash")
+
+  responseStatus Int?    @map("response_status")
+  responseBody   String? @map("response_body")
+
+  inProgressUntil DateTime @map("in_progress_until")
+  expiresAt       DateTime @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, method, path, idempotencyKey])
+  @@map("idempotency_keys")
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
 }
