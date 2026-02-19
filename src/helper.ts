@@ -41,19 +41,19 @@ export const purchaseCredits = async (req: Request): Promise<Response> => {
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId } }
             });
 
-            if (!treasuryWallet || treasuryWallet.balance < BigInt(amount)) {
+            if (!treasuryWallet || treasuryWallet.balance.lt(amount)) {
                 throw new Error("Treasury has insufficient funds");
             }
 
             await tx.wallet.update({
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId } },
-                data: { balance: { decrement: BigInt(amount) } },
+                data: { balance: { decrement: amount } },
             });
 
             const wallet = await tx.wallet.upsert({
                 where: { userId_assetTypeId: { userId, assetTypeId } },
-                update: { balance: { increment: BigInt(amount) } },
-                create: { userId, assetTypeId, balance: BigInt(amount) },
+                update: { balance: { increment: amount } },
+                create: { userId, assetTypeId, balance: amount },
             });
 
             const transactionId = Bun.randomUUIDv7();
@@ -109,18 +109,18 @@ export const spendCredits = async (req: Request): Promise<Response> => {
                 where: { userId_assetTypeId: { userId, assetTypeId } }
             });
 
-            if (!userWallet || userWallet.balance < BigInt(amount)) {
+            if (!userWallet || userWallet.balance.lt(amount)) {
                 throw new Error("User has insufficient credits");
             }
 
             const wallet = await tx.wallet.update({
                 where: { userId_assetTypeId: { userId, assetTypeId } },
-                data: { balance: { decrement: BigInt(amount) } },
+                data: { balance: { decrement: amount } },
             });
 
             await tx.wallet.update({
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId } },
-                data: { balance: { increment: BigInt(amount) } },
+                data: { balance: { increment: amount } },
             });
 
             const transactionId = Bun.randomUUIDv7();
@@ -175,19 +175,19 @@ export const bonus = async (req: Request): Promise<Response> => {
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId: BONUS_ASSET_TYPE_ID } }
             });
 
-            if (!treasuryWallet || treasuryWallet.balance < BigInt(amount)) {
+            if (!treasuryWallet || treasuryWallet.balance.lt(amount)) {
                 throw new Error("Treasury has insufficient funds for bonus");
             }
 
             await tx.wallet.update({
                 where: { userId_assetTypeId: { userId: TREASURY_ACCOUNT_ID, assetTypeId: BONUS_ASSET_TYPE_ID } },
-                data: { balance: { decrement: BigInt(amount) } },
+                data: { balance: { decrement: amount } },
             });
 
             const wallet = await tx.wallet.upsert({
                 where: { userId_assetTypeId: { userId, assetTypeId: BONUS_ASSET_TYPE_ID } },
-                update: { balance: { increment: BigInt(amount) } },
-                create: { userId, assetTypeId: BONUS_ASSET_TYPE_ID, balance: BigInt(amount) },
+                update: { balance: { increment: amount } },
+                create: { userId, assetTypeId: BONUS_ASSET_TYPE_ID, balance: amount },
             });
 
             const transactionId = Bun.randomUUIDv7();
