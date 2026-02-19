@@ -80,7 +80,7 @@ app.post("/purchase-credits", async (c) => {
             });
 
             if (!treasuryWallet || treasuryWallet.balance < amount) {
-                throw new Error("Treasury has insufficient funds");
+                return c.json({ status: "error", message: "Treasury has insufficient funds" }, 400);
             }
 
             // debit treasury
@@ -174,7 +174,7 @@ app.post("/spend-credits", async (c) => {
             });
 
             if (!userWallet || userWallet.balance < amount) {
-                throw new Error("User has insufficient credits");
+                return c.json({ status: "error", message: "User has insufficient credits" }, 400);
             }
 
             // debit user
@@ -260,7 +260,7 @@ app.post("/bonus", async (c) => {
             });
 
             if (!treasuryWallet || treasuryWallet.balance < amount) {
-                throw new Error("Treasury has insufficient loyalty points for bonus");
+                return c.json({ status: "error", message: "Treasury has insufficient loyalty points for bonus" }, 400);
             }
 
             await tx.wallet.update({
