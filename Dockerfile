@@ -8,7 +8,7 @@ RUN bun install
 
 # copy prisma schema and generate client
 COPY prisma ./prisma
-RUN bunx prisma generate
+RUN bun run db:generate
 
 # copying rest of application
 COPY . .
