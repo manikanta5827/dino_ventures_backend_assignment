@@ -19,6 +19,13 @@ const app = new Hono<{ Variables: Variables }>();
 const TREASURY_ACCOUNT_ID = 1;
 const BONUS_ASSET_TYPE_ID = 3;
 
+class TransactionError extends Error {
+    constructor(public override message: string, public statusCode: number = 400) {
+        super(message);
+        this.name = "TransactionError";
+    }
+}
+
 enum EntryType {
     CREDIT = "credit",
     DEBIT = "debit",
@@ -80,7 +87,7 @@ app.post("/purchase-credits", async (c) => {
             });
 
             if (!treasuryWallet || treasuryWallet.balance < amount) {
-                return c.json({ status: "error", message: "Treasury has insufficient funds" }, 400);
+                throw new TransactionError("Treasury has insufficient funds", 400);
             }
 
             // debit treasury
@@ -126,6 +133,9 @@ app.post("/purchase-credits", async (c) => {
 
         return c.json({ status: "success", data: result }, 200);
     } catch (error) {
+        if (error instanceof TransactionError) {
+            return c.json({ status: "error", message: error.message }, error.statusCode as any);
+        }
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("Error in /purchase-credits:", errorMessage);
         return c.json({ status: "failed", message: "Internal server error" }, 500);
@@ -173,8 +183,10 @@ app.post("/spend-credits", async (c) => {
                 where: { userId_assetTypeId: { userId, assetTypeId } },
             });
 
+            console.log(`balance :: ${userWallet?.balance}`);
+            console.log(`amount :: ${amount}`)
             if (!userWallet || userWallet.balance < amount) {
-                return c.json({ status: "error", message: "User has insufficient credits" }, 400);
+                throw new TransactionError("User has insufficient credits", 400);
             }
 
             // debit user
@@ -219,6 +231,9 @@ app.post("/spend-credits", async (c) => {
 
         return c.json({ status: "success", data: result }, 200);
     } catch (error) {
+        if (error instanceof TransactionError) {
+            return c.json({ status: "error", message: error.message }, error.statusCode as any);
+        }
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("Error in /spend-credits:", errorMessage);
         return c.json({ status: "failed", message: "Internal server error" }, 500);
@@ -260,7 +275,7 @@ app.post("/bonus", async (c) => {
             });
 
             if (!treasuryWallet || treasuryWallet.balance < amount) {
-                return c.json({ status: "error", message: "Treasury has insufficient loyalty points for bonus" }, 400);
+                throw new TransactionError("Treasury has insufficient loyalty points for bonus", 400);
             }
 
             await tx.wallet.update({
@@ -303,6 +318,9 @@ app.post("/bonus", async (c) => {
 
         return c.json({ status: "success", data: result }, 200);
     } catch (error) {
+        if (error instanceof TransactionError) {
+            return c.json({ status: "error", message: error.message }, error.statusCode as any);
+        }
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("Error in /bonus:", errorMessage);
         return c.json({ status: "failed", message: "Internal server error" }, 500);
