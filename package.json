@@ -1,6 +1,6 @@
 {
     "name": "dino_ventures_backend_assignment",
-    "module": "index.ts",
+    "module": "app.ts",
     "type": "module",
     "private": true,
     "scripts": {
@@ -9,8 +9,10 @@
         "db:seed": "bunx --bun prisma db seed",
         "db:generate": "bunx --bun prisma generate",
         "db:format": "bunx --bun prisma format",
-        "dev": "bun --hot index.ts",
-        "start": "bun index.ts"
+        "db:reset": "bunx --bun prisma migrate reset",
+        "db:custom_migration": "bunx --bun prisma migrate dev --create-only",
+        "dev": "bun --hot app.ts",
+        "start": "bun app.ts"
     },
     "devDependencies": {
         "@types/bun": "latest",

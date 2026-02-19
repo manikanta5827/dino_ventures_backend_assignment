@@ -37,7 +37,7 @@ services:
         echo 'seeding database...' &&
         bun run db:seed &&
         echo 'starting application...' &&
-        bun run index.ts
+        bun start
       "
 
 volumes:

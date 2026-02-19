@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { prisma } from "./db_config";
 import { Prisma } from "../generated/prisma/client";
+import { logger } from "hono/logger";
 import { idempotencyMiddleware, idempotencyResponseHook } from "./idempotency_helper";
 
 type Variables = {
@@ -24,6 +25,7 @@ enum EntryType {
 }
 
 // idempotency middleware globally
+app.use(logger());
 app.use("*", idempotencyMiddleware);
 app.use("*", idempotencyResponseHook);
 
@@ -58,7 +60,7 @@ app.post("/purchase-credits", async (c) => {
 
     // transaction logic
     const result = await prisma.$transaction(async (tx) => {
-        
+
         // locking rows
         await tx.$executeRaw`
             SELECT * FROM wallets 

@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["bun", "run", "index.ts"]
+CMD ["bun", "start"]

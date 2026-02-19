@@ -1,0 +1,11 @@
+-- -- First, ensure the pg_cron extension is enabled
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- -- Schedule the daily cleanup job for every day at midnight 12
+-- SELECT cron.schedule(
+--     'cleanup_expired_idempotency_keys',
+--     '0 0 * * *',
+--     $$
+--         DELETE FROM idempotency_keys WHERE expires_at < NOW();
+--     $$
+-- );
