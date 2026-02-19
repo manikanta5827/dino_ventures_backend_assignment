@@ -1,4 +1,4 @@
-# API Documentation
+# API and DB Documentation
 
 ## Idempotency
 
@@ -122,3 +122,53 @@ All errors follow this structure:
   "message": "Description of the error"
 }
 ```
+
+## 2. Database Schema
+
+### Users (`users`)
+
+| Field       | What it is                          |
+| :---------- | :---------------------------------- |
+| `id`        | Unique ID.                          |
+| `name`      | User's name.                        |
+| `email`     | Unique identifier.                  |
+| `isSystem`  | True for Treasury, False for users. |
+| `createdAt` | When the account was created.       |
+
+### Asset Types (`asset_types`)
+
+| Field         | What it is          |
+| :------------ | :------------------ |
+| `id`          | Unique ID.          |
+| `name`        | e.g., "Gold Coins". |
+| `description` | Notes on usage.     |
+| `createdAt`   | When added.         |
+
+### Wallets (`wallets`)
+
+| Field         | What it is     |
+| :------------ | :------------- |
+| `userId`      | Owner.         |
+| `assetTypeId` | Currency type. |
+| `balance`     | Current total. |
+| `updatedAt`   | Last change.   |
+
+### Audit Ledger (`audit_ledger`)
+
+| Field           | What it is                  |
+| :-------------- | :-------------------------- |
+| `transactionId` | Links both sides of a move. |
+| `userId`        | Whose balance changed.      |
+| `entryType`     | `credit` or `debit`.        |
+| `amount`        | Value moved.                |
+| `createdAt`     | Exact timestamp.            |
+
+### Idempotency Keys (`idempotency_keys`)
+
+| Field             | What it is                    |
+| :---------------- | :---------------------------- |
+| `idempotencyKey`  | Unique key from frontend.     |
+| `status`          | `IN_PROGRESS` or `COMPLETED`. |
+| `responseBody`    | Cached result.                |
+| `inProgressUntil` | Timeout for stuck requests.   |
+| `expiresAt`       | Cleanup timestamp.            |
