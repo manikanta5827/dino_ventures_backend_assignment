@@ -1,0 +1,18 @@
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# dependencies
+COPY package.json bun.lock ./
+RUN bun install
+
+# copy prisma schema and generate client
+COPY prisma ./prisma
+RUN bunx prisma generate
+
+# copying rest of application
+COPY . .
+
+EXPOSE 8080
+
+CMD ["bun", "run", "index.ts"]
